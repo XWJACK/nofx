@@ -10,19 +10,22 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	mapset "github.com/deckarep/golang-set/v2"
 )
 
-// defaultMainstreamCoins 默认主流币种池（当AI500和OI Top都失败时使用）
-var defaultMainstreamCoins = []string{
+var FamousCoins = mapset.NewSet(
 	"BTCUSDT",
 	"ETHUSDT",
+)
+var altCoins = mapset.NewSet(
 	"SOLUSDT",
 	"BNBUSDT",
 	"XRPUSDT",
 	"DOGEUSDT",
 	"ADAUSDT",
 	"HYPEUSDT",
-}
+)
 
 // CoinPoolConfig 币种池配置
 type CoinPoolConfig struct {
@@ -88,13 +91,13 @@ func GetCoinPool() ([]CoinInfo, error) {
 	// 优先检查是否启用默认币种列表
 	if coinPoolConfig.UseDefaultCoins {
 		log.Printf("✓ 已启用默认主流币种列表")
-		return convertSymbolsToCoins(defaultMainstreamCoins), nil
+		return convertSymbolsToCoins(append(FamousCoins.ToSlice(), altCoins.ToSlice()...)), nil
 	}
 
 	// 检查API URL是否配置
 	if strings.TrimSpace(coinPoolConfig.APIURL) == "" {
 		log.Printf("⚠️  未配置币种池API URL，使用默认主流币种列表")
-		return convertSymbolsToCoins(defaultMainstreamCoins), nil
+		return convertSymbolsToCoins(append(FamousCoins.ToSlice(), altCoins.ToSlice()...)), nil
 	}
 
 	maxRetries := 3
@@ -133,7 +136,7 @@ func GetCoinPool() ([]CoinInfo, error) {
 
 	// 缓存也失败，使用默认主流币种
 	log.Printf("⚠️  无法加载缓存数据（最后错误: %v），使用默认主流币种列表", lastErr)
-	return convertSymbolsToCoins(defaultMainstreamCoins), nil
+	return convertSymbolsToCoins(append(FamousCoins.ToSlice(), altCoins.ToSlice()...)), nil
 }
 
 // fetchCoinPool 实际执行币种池请求
