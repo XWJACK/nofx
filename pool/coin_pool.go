@@ -86,6 +86,14 @@ func SetUseDefaultCoins(useDefault bool) {
 	coinPoolConfig.UseDefaultCoins = useDefault
 }
 
+// SetDefaultCoins 设置默认主流币种列表
+func SetDefaultCoins(coins []string) {
+	// if len(coins) > 0 {
+	// 	defaultMainstreamCoins = mapset.NewSet(coins...)
+	// 	log.Printf("✓ 已设置默认币种池（共%d个币种）: %v", len(coins), coins)
+	// }
+}
+
 // GetCoinPool 获取币种池列表（带重试和缓存机制）
 func GetCoinPool() ([]CoinInfo, error) {
 	// 优先检查是否启用默认币种列表
